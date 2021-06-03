@@ -679,5 +679,5 @@ player.fd(20)
 player.lt(90)
 player.fd(20)
 
-#player.hideturtle()
+player.hideturtle()
 turtle.done()
