@@ -1,7 +1,7 @@
 import turtle
 
 player = turtle.Turtle()
-size = 110
+size = 150
 
 player.fd(size)
 player.lt(90)
@@ -52,7 +52,7 @@ player.rt(60)
 player.fd(size/10)
 player.rt(90)
 player.up()
-player.fd(300)
+player.fd(400)
 player.lt(90)
 
 player.down()
