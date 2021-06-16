@@ -1,8 +1,6 @@
 import turtle
 player = turtle.Turtle()
 
-
-
 def square(x, y, color):
     """
     Нарисуем фигуру в нужном месте
@@ -30,15 +28,25 @@ def square(x, y, color):
         player.fd(length)
         player.end_fill()
         player.lt(90)
+        player.fd(length)
 
 
-iterations = 2
+iterations = 4
 for j in range(iterations):
-    j = j+1
-    l = j*2
+    #l=j+1
+    square(j*60, 0, 'SaddleBrown')
+    #square(j*(l*30)+30, 0, 'lightyellow')
 
-    square(j*30, 0, 'SaddleBrown')
-    square(l*30, 0, 'lightyellow')
+player.lt(180)
+player.fd(120)
+player.lt(180)
+
+
+
+for l in range(iterations):
+    square(l*60, 0, 'lightyellow')
+
+
 
 
 #player.hideturtle()

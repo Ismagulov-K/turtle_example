@@ -1,6 +1,7 @@
 import turtle
 
 player = turtle.Turtle()
+player.speed(0)
 
 length = 400
 position = length/2

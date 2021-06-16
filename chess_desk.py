@@ -1,8 +1,9 @@
 import turtle
 
 player = turtle.Turtle()
+player.speed(0)
 
-length = 100
+length = 200
 position = length/2
 player.rt(180)
 player.up()
