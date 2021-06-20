@@ -31,20 +31,26 @@ def square(x, y, color):
         player.fd(length)
 
 
-iterations = 4
-for j in range(iterations):
-    #l=j+1
-    square(j*60, 0, 'SaddleBrown')
-    #square(j*(l*30)+30, 0, 'lightyellow')
+iterations = 8
+for k in range(iterations):
 
-player.lt(180)
-player.fd(120)
-player.lt(180)
-
+    for j in range(8):
+        if (j+k)%2==0:
+            square(j*30, k*30, 'SaddleBrown')
+        else:
+            square(j*30, k*30, 'lightyellow')
 
 
-for l in range(iterations):
-    square(l*60, 0, 'lightyellow')
+
+#for l in range(iterations):
+
+
+#square(j*(l*30)+30, 0, 'lightyellow')
+
+#player.lt(180)
+#player.fd(120)
+#player.lt(180)
+
 
 
 

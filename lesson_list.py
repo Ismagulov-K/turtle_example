@@ -19,22 +19,25 @@ def checker(x, y, size, color):
     player.begin_fill()
 
 
-    for i in range(iterations+1):
+    for i in range(iterations):
         player.fd(size/iterations)
         player.left(360/iterations)
 
 
     player.end_fill()
 
-checker(0, 0, 360,'darkgrey')
-checker(11, 10, 300, 'white')
-checker(15, 20, 240, 'darkgrey')
+#checker(0, 0, 360,'darkgrey')
 
 
-#player.circle(100)
-#player.circle(800)
-#player.circle(600)
-
+figure = [1, 0, 1, 1, 1, 1, ]
+x=-200
+y=0
+for item in figure:
+    if item%2 == 0:
+        checker(x, y, 360, 'darkgrey')
+    else:
+        checker(x, y, 300, 'black')
+    x=x+150
 
 player.hideturtle()
 turtle.done()
