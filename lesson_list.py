@@ -26,7 +26,6 @@ def checker(x, y, size, color):
 
     player.end_fill()
 
-#checker(0, 0, 360,'darkgrey')
 
 
 figure = [1, 0, 1, 1, 1, 1, ]
