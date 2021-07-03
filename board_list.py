@@ -17,24 +17,18 @@ def square(x, y, color):
     player.down()
 
     player.fillcolor(color)
-    iterations = 1
-    for i in range(iterations):
-        player.begin_fill()
+    iteration = 4
+    player.begin_fill()
+    for i in range(iteration):
         player.fd(length)
         player.lt(90)
-        player.fd(length)
-        player.lt(90)
-        player.fd(length)
-        player.lt(90)
-        player.fd(length)
-        player.end_fill()
-        player.lt(90)
-        player.fd(length)
+    player.end_fill()
+
 
 def checker_board(x,y):
     figure = [1, 0, 1, 0, 1, 0, 1, 0]
     for item in figure:
-        y = y + 50
+        y = y - 50
         if item%2 == 1:
             for item in figure:
                 if item%2 == 0:
@@ -49,11 +43,11 @@ def checker_board(x,y):
                 else:
                     square(x, y, 'SaddleBrown')
                 x=x+50
-
         x = -200
 
 
 
+checker_board(-200, 200)
 
 player.hideturtle()
 turtle.done()
