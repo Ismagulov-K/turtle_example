@@ -3,6 +3,9 @@ from random import random
 car = turtle.Turtle()
 car.shape('turtle')
 
+button = turtle.Turtle()
+
+button.goto(x, y)
 
 def create_car(x, y):
     turtle.tracer(False)
@@ -10,8 +13,6 @@ def create_car(x, y):
     car_xy.up()
     car_xy.goto(x, y)
     car_xy.fillcolor((random(), random(), random()))
-    cars = []
-    cars.append(car_xy)
     turtle.tracer(True)
 
 def drive():
@@ -26,12 +27,7 @@ turtle.ontimer(create_car, 100)
     #cars.goto(0, 10)
     #cars.clear()
     #cars.forward(1000)
-
-
     #turtle.tracer(True)
-
-
-
 
 #turtle.ontimer(drive, 100)
 
