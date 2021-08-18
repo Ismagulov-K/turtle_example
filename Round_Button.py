@@ -36,12 +36,12 @@ class RoundButton(turtle.Turtle):
 
     def on_button(self, x, y):
         """Обработчик нажатия на кнопку"""
-        print('Нажата круглая кнопка')
+        print('Нажата круглая кнопка!!!')
 
     def test_button(self, x: int, y: int):
         """проверка нажатия на круглую кнопку"""
         radius = math.sqrt((self.point2.x - self.point1.x) ** 2 + (self.point2.y - self.point1.y) ** 2)
-        if math.sqrt((self.point2.x - self.point1.x)**2 + (self.point2.y - self.point1.y)**2) < radius:
+        if ((self.point2.x - self.point1.x)**2) + ((self.point2.y - self.point1.y)**2) <= radius**2:
             print(f'({x}, {y}')
             #turtle.tracer(False)
             #round_t = turtle.Turtle()
