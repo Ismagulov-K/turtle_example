@@ -18,7 +18,7 @@ class Label(turtle.Turtle):
 class Checker(turtle.Turtle):
     is_lady: bool = False
 
-    def __init__(self, i: int, j: int, size: float, color):
+    def __init__(self, i: int, j: int, size: float, color: Tuple[float, float, float]):
         super().__init__(shape='circle')
         self.up()
         self._color = color
@@ -35,9 +35,9 @@ class Checker(turtle.Turtle):
 
     def is_black(self) -> bool:
         """Проверяет шашка чёрная или нет"""
-        if self._color == 'white':
+        if self._color[0] > 1:
             return False
-        elif self._color == 'black':
+        else:
             return True
 
     def __str__(self):
@@ -60,11 +60,6 @@ class Square(turtle.Turtle):
         self.shapesize(2, 2)
 
 
-class PointXy:
-    x: int()
-    y: int()
-
-
 class Board(turtle.Turtle):
 
     board: List[List[Square]] = []
@@ -73,6 +68,7 @@ class Board(turtle.Turtle):
     checkers: List[List[Checker]] = []
     take_checker: Optional[Tuple[int, int]] = None
     status: Label = Label(-100, -150)
+    error: Label = Label(-200, -250)
     step_white: bool = True
 
     def __init__(self, size=800, count=8):
@@ -94,13 +90,6 @@ class Board(turtle.Turtle):
         turtle.tracer(True)
 
     def create_checkers(self):
-
-        #for i in self.checkers:
-            #for j in i:
-                #if j is not None:
-                    #j.hideturtle()
-                    #j = None
-
         turtle.tracer(False)
 
         for i in range(self.count):
@@ -110,11 +99,13 @@ class Board(turtle.Turtle):
 
                 if is_set:
                     if i < 3:
-                        checker = Checker(i, j, 40, 'black')
+                        c = 0.1
+                        checker = Checker(i, j, 40, (c, c, c))
                         chess_line.append(checker)
                         continue
                     if i >= 5:
-                        checker = Checker(i, j, 40, 'white')
+                        c = c + 254
+                        checker = Checker(i, j, 40, (c, c, c))
                         chess_line.append(checker)
                         continue
                 chess_line.append(None)
@@ -136,15 +127,20 @@ class Board(turtle.Turtle):
             j += int(math.copysign(1, distance_j))
         return trace_step
 
-
-
     def validation_move(self, i1: int, j1: int, i2: int, j2: int) -> bool:
         return True
-        f: Checker = self.checkers[i1][j1]
+
         # 1 Ходить можно только шашкой пустым местом не ходим
+        f: Checker = self.checkers[i1][j1]
         if f is None:
-            self.status.msg('Не можем ходить пустым местом')
+            self.error.msg('Не можем ходить пустым местом')
             return
+        # 2 Ходить только в пустое место
+        f1: Checker = self.checkers[i2][j2]
+        if f1 is not None:
+            self.error.msg('Нельзя ходить на другую шашку')
+            return
+
 
     def move(self, i1: int, j1: int, i2: int, j2: int):
 
@@ -152,25 +148,16 @@ class Board(turtle.Turtle):
 
         # --> Троссировка шашки <-
 
-        # 2 Ходить только в пустое место
-        f1: Checker = self.checkers[i2][j2]
-        if f1 is not None:
-            self.status.msg('Нельзя ходить на другую шашку')
-            return
 
         # 12 Шашка не может ходить назад
         if f.is_black():
             if i2 < i1:
-                self.status.msg('Нельзя ходить назад')
+                self.error.msg('Нельзя ходить назад')
                 return
         else:
             if i2 > i1:
-                self.status.msg('Нельзя ходить назад')
+                self.error.msg('Нельзя ходить назад')
                 return
-
-        # 5. Шашка может ходить только на 1 клетку по диагонали
-
-
 
         f.goto(i2 * 40, j2 * 40)
 
@@ -184,128 +171,9 @@ class Board(turtle.Turtle):
         self.checkers[i2][j2] = f
         self.checkers[i1][j1] = None
 
-
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-
-class Button(turtle.Turtle):
-    point1: Point
-    point2: Point
-    title: str
-
-    def __init__(self, point1: Point, point2: Point, title: str):
-        super(Button, self).__init__()
-
-        self.point1 = point1
-        self.point2 = point2
-        self.title = title
-
-        self.draw_button()
-
-    def draw_button(self):
-        turtle.tracer(False)
-        self.hideturtle()
-
-        self.up()
-        self.goto(self.point1.x, self.point1.y)
-        self.down()
-        self.goto(self.point2.x, self.point1.y)
-        self.goto(self.point2.x, self.point2.y)
-        self.goto(self.point1.x, self.point2.y)
-        self.goto(self.point1.x, self.point1.y)
-        turtle.tracer(True)
-
-    def on_button(self, x, y):
-        """Обработчик нажатия на кнопку"""
-        pass
-
-    def test_button(self, x: int, y: int):
-        """проверка нажатия на кнопку"""
-        pass
-
-
-class SquareButton(Button):
-    def __init__(self, point1: Point, point2: Point, title: str, board: Board):
-        super(SquareButton, self).__init__(point1, point2, title)
-        self.board = board
-
-    def on_button(self, x, y):
-        """Обработчик нажатия на кнопку"""
-        print('Новая игра')
-        self.board.create_checkers()
-
-    def test_button(self, x: int, y: int):
-        """проверка нажатия на кнопку"""
-        if self.point1.x < x < self.point2.x and self.point1.y > y > self.point2.y:
-            print(f'({x}, {y}')
-            self.on_button(x, y)
-
-#
-# class Point:
-#     def __init__(self, x, y):
-#         self.x = x
-#         self.y = y
-
-#
-# class RoundButton(turtle.Turtle):
-#     point1: Point
-#     point2: Point
-#     title: str
-#
-#     def __init__(self, point1: Point, point2: Point, title: str):
-#         super(RoundButton, self).__init__()
-#
-#         self.point1 = point1
-#         self.point2 = point2
-#         self.title = title
-#         self.round_button()
-#
-#     def round_button(self):
-#         turtle.tracer(False)
-#         self.hideturtle()
-#
-#         self.up()
-#         self.goto(self.point1.x, self.point1.y)
-#         radius = math.sqrt((self.point2.x - self.point1.x) ** 2 + (self.point2.y - self.point1.y) ** 2)
-#         self.down()
-#         self.circle(radius)
-#         turtle.tracer(True)
-#         print(radius)
-#
-#     def on_button(self, x, y):
-#         """Обработчик нажатия на кнопку"""
-#         print('Нажата круглая кнопка')
-#
-#     def test_button(self, x: int, y: int):
-#         """проверка нажатия на круглую кнопку"""
-#         radius = math.sqrt((self.point2.x - self.point1.x) ** 2 + (self.point2.y - self.point1.y) ** 2)
-#         if ((self.point2.x - self.point1.x) ** 2) + ((self.point2.y - self.point1.y) ** 2) <= radius ** 2:
-#             print(f'({x}, {y}')
-#             # turtle.tracer(False)
-#             # round_t = turtle.Turtle()
-#             # round_t.shape('turtle')
-#             # round_t.up()
-#             # round_t.goto(x, y)
-#             # turtle.tracer(True)
-#             self.on_button(x, y)
-#
-
 turtle.tracer(False)
-turtle.up()
-turtle.goto(-50, -86)
-turtle.down()
-turtle.write("New game", font=("Arial", 16, "normal"))
-turtle.hideturtle()
-turtle.tracer(True)
-
 board = Board()
-b1 = SquareButton(Point(-100, -50), Point(100, -100), title=1, board=board)
-
-buttons = [b1]
-
+turtle.tracer(True)
 
 def on_click_screen(x, y):
     print('клик в точку (', x, y, ')')
@@ -329,11 +197,13 @@ def on_click_screen(x, y):
         if active_checker is not None:
             active_checker.select_checker()
     else:
+        active_i = board.take_checker[0]
+        active_j = board.take_checker[1]
         board.move(
-            board.take_checker[0], board.take_checker[1],
+            active_i, active_j,
             i, j
         )
-        act_checker = board.checkers[board.take_checker[0]][board.take_checker[1]]
+        act_checker = board.checkers[active_i][active_j]
         if act_checker is not None:
             act_checker.unselect_checker()
 
