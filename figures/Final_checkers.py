@@ -27,15 +27,20 @@ class Checker(turtle.Turtle):
         self.goto(i * size, j * size)
         self.shapesize(1.6, 1.6, 2)
 
+    def set_lady(self):
+        self.is_lady = True
+        self.shapesize(1.6, 1.6, 6)
+        self.pencolor('green')
+
     def select_checker(self):
         self.pencolor('red')
 
     def unselect_checker(self):
         self.pencolor('grey')
 
-    def is_black(self) -> bool:
+    def is_black(self):
         """Проверяет шашка чёрная или нет"""
-        if self._color[0] > 1:
+        if self._color == 'black':
             return False
         else:
             return True
@@ -99,20 +104,19 @@ class Board(turtle.Turtle):
 
                 if is_set:
                     if i < 3:
-                        c = 0.1
-                        checker = Checker(i, j, 40, (c, c, c))
+                        checker = Checker(i, j, 40, 'black')
                         chess_line.append(checker)
                         continue
                     if i >= 5:
-                        c = c + 254
-                        checker = Checker(i, j, 40, (c, c, c))
+                        checker = Checker(i, j, 40, 'white')
                         chess_line.append(checker)
                         continue
                 chess_line.append(None)
             self.checkers.append(chess_line)
         turtle.tracer(True)
 
-    def trace_path(self, i1: int, j1: int, i2: int, j2: int):
+     def move(self, i1: int, j1: int, i2: int, j2: int):
+
         distance_i = i2 - i1
         distance_j = j2 - j1
         i: int = int(i1)
@@ -121,28 +125,41 @@ class Board(turtle.Turtle):
         count_steps = abs(distance_i)
         trace_step = []
 
+        # 1 Ходить можно только шашкой пустым местом не ходим
+        f: Checker = self.checkers[i1][j1]
+
+        if f is None:
+            self.error.msg('Не можем ходить пустым местом')
+            return
+
         for k in range(count_steps + 1):
             trace_step.append((i, j, str(self.checkers[i][j])))
             i += int(math.copysign(1, distance_i))
             j += int(math.copysign(1, distance_j))
-        return trace_step
 
-    def validation_move(self, i1: int, j1: int, i2: int, j2: int) -> bool:
-        return True
+        victim_list = []
 
-        # 1 Ходить можно только шашкой пустым местом не ходим
-        f: Checker = self.checkers[i1][j1]
-        if f is None:
-            self.error.msg('Не можем ходить пустым местом')
-            return
+        if len(trace_step) >= 3:
+            checker_attack = trace_step[0][2]
+            attack_is_black = checker_attack.is_black()
+
+            for kill_checker_tuple in trace_step:
+                victim = kill_checker_tuple[2]
+
+                if victim is None:
+                    continue
+
+                victim_is_black = victim_is_black()
+
+                if attack_is_black != victim_is_black:
+                    victim_list.append(kill_checker_tuple)
+
+
         # 2 Ходить только в пустое место
         f1: Checker = self.checkers[i2][j2]
         if f1 is not None:
             self.error.msg('Нельзя ходить на другую шашку')
             return
-
-
-    def move(self, i1: int, j1: int, i2: int, j2: int):
 
         f: Checker = self.checkers[i1][j1]
 
@@ -150,16 +167,71 @@ class Board(turtle.Turtle):
 
 
         # 12 Шашка не может ходить назад
+        if f.is_lady:
+            if f.is_black():
+                if i2 < i1:
+                    self.error.msg('Нельзя ходить назад')
+                    return
+                else:
+                    if i2 == i1 or j2 == j1:
+                        self.error.msg('Неверный ход!')
+                        return
+
+            else:
+                if i2 > i1:
+                    self.error.msg('Нельзя ходить назад')
+                    return
+                else:
+                    if i2 == i1 or j2 == j1:
+                        self.error.msg('Неверный ход!')
+                        return
+        # Нельзя ходить через две клетки
+        if f.is_lady:
+            if f.is_black():
+                if trace_step[1][2] is not None:
+                    print('Верный ход')
+                else:
+                    if len(trace_step) >= 3:
+                        self.error.msg('Нельзя ходить через две пустые клетки')
+                        return
+            else:
+                if trace_step[1][2] is not None:
+                    print('Верный ход')
+                else:
+                    if len(trace_step) >= 3:
+                        self.error.msg('Нельзя ходить через две пустые клетки')
+                        return
+
+        # 7. Шашка превращается в дамку на противоположной стороне
+
         if f.is_black():
-            if i2 < i1:
-                self.error.msg('Нельзя ходить назад')
-                return
+            if i2 == board.count - 1:
+                f.set_lady()
         else:
-            if i2 > i1:
-                self.error.msg('Нельзя ходить назад')
+            if i2 == 0:
+                f.set_lady()
+
+        # 4. дамка может ходить по диагонали в любое место
+
+        first_step = trace_step[0]
+        last_step = trace_step[-1]
+        first_eq = first_step[0] == i1 and first_step[1] == j1
+        last_eq = last_step[0] == i2 and last_step[1] == j2
+
+        if not (first_eq and last_eq):
+            self.error.msg('Ходить можно только по диагонали')
+            return
+
+        # 10. Дамка может бить по диагонали только чужих
+
+        for color_is_black in trace_step[1:]:
+            if first_step[2] is not None and first_step[2].is_black() == color_is_black[2].is_black():
+                self.error.msg('Своих рубить нельзя!')
                 return
 
         f.goto(i2 * 40, j2 * 40)
+
+        for next_victim in victim_list
 
         if self.step_white:
             self.status.msg('Ход белых')
